@@ -20,7 +20,7 @@ end
 dep 'upgraded packages' do
   met? {
     upgrade_check = `#{Babushka::AptHelper.pkg_cmd} -s -y upgrade`
-    upgrade_check =~ /\<0 packages upgraded\>/ || upgrade_check =~ /\<0 upgraded\>/
+    upgrade_check =~ /\b0 packages upgraded/ || upgrade_check =~ /\b0 upgraded/
   }
   meet { log_shell 'Upgrading distribution',
                    "#{Babushka::AptHelper.pkg_cmd} -y upgrade",
