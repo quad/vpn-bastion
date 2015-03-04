@@ -17,7 +17,7 @@ dep 'local apt sources', :country do
 end
 
 dep 'upgraded packages' do
-  met? { `/usr/lib/update-notifier/apt-check --package-names`.strip.empty? }
+  met? { `/usr/lib/update-notifier/apt-check --package-names 2>&1`.strip.empty? }
   meet { log_shell 'Upgrading distribution',
                    "#{Babushka::AptHelper.pkg_cmd} -y upgrade",
                    :sudo => Babushka::AptHelper.should_sudo? }
