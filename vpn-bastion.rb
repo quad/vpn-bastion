@@ -10,7 +10,7 @@ LINUX_IMAGE_PKG = "linux-image-#{LINUX_VERSION}"
 
 dep 'linux modules' do
   # Workaround https://bugs.launchpad.net/bugs/1278437
-  requires dep('initscripts'),
+  requires dep('initscripts.managed'),
            "#{LINUX_IMAGE_PKG}.managed"
 end
 
