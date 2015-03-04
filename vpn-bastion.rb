@@ -143,7 +143,7 @@ end
 dep 'vnc directory' do
   target = '~/.vnc'.p
 
-  met? { target.dir? && File.stat(target.abspath).mode == 040700 }
+  met? { target.dir? && File.stat(target).mode == 040700 }
   meet {
     target.mkdir
     sudo "chmod 700 #{target}"
