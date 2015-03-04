@@ -133,8 +133,13 @@ end
 dep 'xstartup' do
   requires 'vnc directory'
 
-  target = '~/.vnc/xstartup'.p
-  template = dependency.load_path.parent / 'xstartup.erb'
+  def target
+    '~/.vnc/xstartup'.p
+  end
+
+  def template
+    dependency.load_path.parent / 'xstartup.erb'
+  end
 
   def look
     sudo "chmod 755 '#{target.dirname}'"
