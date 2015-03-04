@@ -2,6 +2,7 @@ dep 'provision' do
   requires 'local apt sources'.with('cn'),
            'upgraded packages',
            'vpn',
+           'vnc',
            'bastion'
 end
 
@@ -81,7 +82,6 @@ dep 'chap-secrets' do
   target = '/etc/ppp/chap-secrets'
   template = dependency.load_path.parent / 'chap-secrets.erb'
 
-  # TODO: Fix permissions so non-root can compare, or switch to root to compare.
   before { sudo "chmod 644 '#{target}'" }
   met? { Babushka::Renderable.new(target) }
   meet { render_erb template, :to => target, :sudo => true }
@@ -93,8 +93,6 @@ dep 'vpn' do
            'openjdk i386.managed',
            dep('firefox.managed'),
            dep('xterm.managed'),
-           dep('matchbox-window-manager.managed'),
-           dep('tightvncserver.managed'),
            'update-alternatives fix'
 end
 
@@ -124,4 +122,27 @@ dep 'dpkg architecture', :arch do
     sudo "dpkg --add-architecture #{arch}"
     Babushka::AptHelper.update_pkg_lists "Updating apt with #{arch} architecture"
   }
+end
+
+dep 'vnc' do
+  requires 'xstartup'
+           dep('tightvncserver.managed'),
+           dep('matchbox-window-manager.managed')
+end
+
+dep 'xstartup' do
+  requires 'vnc directory'
+
+  target = '~/.vnc/xstartup'
+  template = dependency.load_path.parent / 'xstartup.erb'
+
+  met? { Babushka::Renderable.new(target).from?(template) }
+  meet { render_erb template, :to => target }
+end
+
+dep 'vnc directory' do
+  target = '~/.vnc'.p
+
+  met? { target.dir? }
+  meet { target.mkdir }
 end
