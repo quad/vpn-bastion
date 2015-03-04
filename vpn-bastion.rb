@@ -1,5 +1,6 @@
 dep 'provision' do
   requires 'local apt sources'.with('cn'),
+           'upgraded packages',
            'vpn',
            'bastion'
 end
@@ -13,6 +14,13 @@ dep 'local apt sources', :country do
     render_erb template, :to => target, :sudo => true
     Babushka::AptHelper.update_pkg_lists "Updating apt with #{country} mirrors"
   }
+end
+
+dep 'upgraded packages' do
+  meet { false }
+  met? { log_shell 'Upgrading distribution',
+                   "#{Babushka::AptHelper.pkg_cmd} upgrade",
+                   Babushka::AptHelper.should_sudo? }
 end
 
 dep 'bastion' do
