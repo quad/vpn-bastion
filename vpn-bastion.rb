@@ -76,7 +76,7 @@ dep 'chap-secrets' do
 end
 
 dep 'vpn' do
-  requires dep('openjdk-7-jre.managed'),
+  requires dep('openjdk-7-jre.managed') { provides 'java'},
            dep('icedtea-plugin.managed'),
            dep('firefox.managed'),
            dep('xterm.managed'),
