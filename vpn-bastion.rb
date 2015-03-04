@@ -19,7 +19,7 @@ end
 dep 'upgraded packages' do
   meet { false }
   met? { log_shell 'Upgrading distribution',
-                   "#{Babushka::AptHelper.pkg_cmd} upgrade",
+                   "#{Babushka::AptHelper.pkg_cmd} -y upgrade",
                    :sudo => Babushka::AptHelper.should_sudo? }
 end
 
