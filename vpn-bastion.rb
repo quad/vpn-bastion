@@ -1,8 +1,14 @@
 dep 'provision' do
   requires 'local apt sources'.with('cn'),
-           # dep('initscripts.managed')   # Workaround https://bugs.launchpad.net/bugs/1278437
+           'linux modules',
            'vpn',
            'bastion'
+end
+
+dep 'linux modules' do
+  # Workaround https://bugs.launchpad.net/bugs/1278437
+  requires dep('initscripts'),
+           dep("linux-image-#{`uname -r`}.managed")
 end
 
 dep 'local apt sources', :country do
