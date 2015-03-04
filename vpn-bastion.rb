@@ -5,10 +5,17 @@ dep 'provision' do
            'bastion'
 end
 
+LINUX_VERSION = `uname -r`.chomp
+LINUX_IMAGE_PKG = "linux-image-#{LINUX_VERSION}"
+
 dep 'linux modules' do
   # Workaround https://bugs.launchpad.net/bugs/1278437
   requires dep('initscripts'),
-           dep("linux-image-#{`uname -r`}.managed")
+           dep("#{LINUX_IMAGE_PKG}.managed")
+end
+
+dep "#{LINUX_IMAGE_PKG}.managed" do
+  provides []
 end
 
 dep 'local apt sources', :country do
