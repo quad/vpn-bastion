@@ -9,12 +9,17 @@ LINUX_VERSION = `uname -r`.chomp
 LINUX_IMAGE_PKG = "linux-image-#{LINUX_VERSION}"
 
 dep 'linux modules' do
-  # Workaround https://bugs.launchpad.net/bugs/1278437
-  requires dep('initscripts.managed'),
+  requires 'initscripts.managed',
            "#{LINUX_IMAGE_PKG}.managed"
 end
 
+dep 'initscripts.managed' do
+  # Workaround https://bugs.launchpad.net/bugs/1278437
+  provides 'mountpoint'
+end
+
 dep "#{LINUX_IMAGE_PKG}.managed" do
+  # CAN HAZ modprobe iptables
   provides []
 end
 
