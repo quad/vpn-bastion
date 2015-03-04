@@ -1,26 +1,7 @@
 dep 'provision' do
   requires 'local apt sources'.with('cn'),
-           'linux modules',
            'vpn',
            'bastion'
-end
-
-LINUX_VERSION = `uname -r`.chomp
-LINUX_IMAGE_PKG = "linux-image-#{LINUX_VERSION}"
-
-dep 'linux modules' do
-  requires 'initscripts.managed',
-           "#{LINUX_IMAGE_PKG}.managed"
-end
-
-dep 'initscripts.managed' do
-  # Workaround https://bugs.launchpad.net/bugs/1278437
-  provides 'mountpoint'
-end
-
-dep "#{LINUX_IMAGE_PKG}.managed" do
-  # CAN HAZ modprobe iptables
-  provides []
 end
 
 dep 'local apt sources', :country do
