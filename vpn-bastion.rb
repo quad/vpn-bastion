@@ -76,13 +76,12 @@ dep 'chap-secrets' do
 end
 
 dep 'vpn' do
-  requires dep('openjdk-7-jre.managed') { provides 'java'},
-           dep('icedtea-plugin.managed'),
+  requires 'openjdk.managed',
+           'openjdk i386.managed',
            dep('firefox.managed'),
            dep('xterm.managed'),
            dep('matchbox-window-manager.managed'),
            dep('tightvncserver.managed'),
-           'openjdk i386.managed',
            'update-alternatives fix'
 end
 
@@ -93,6 +92,11 @@ dep 'update-alternatives fix' do
 
   met? { sbin.readlink == bin }
   meet { sudo "ln -s '#{bin}' '#{sbin}'" }
+end
+
+dep 'openjdk.managed' do
+  installs { via :apt, 'openjdk-7-jre', 'icedtea-plugin' }
+  provides 'java'
 end
 
 dep 'openjdk i386.managed' do
