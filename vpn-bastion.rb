@@ -136,8 +136,10 @@ dep 'xstartup' do
   target = '~/.vnc/xstartup'
   template = dependency.load_path.parent / 'xstartup.erb'
 
+  before { sudo "chmod 755 '#{target.dirname}'" }
   met? { Babushka::Renderable.new(target).from?(template) }
-  meet { render_erb template, :to => target }
+  meet { render_erb template, :to => target, :sudo => true }
+  before { sudo "chmod 700 '#{target.dirname}'" }
 end
 
 dep 'vnc directory' do
