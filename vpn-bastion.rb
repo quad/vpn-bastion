@@ -71,6 +71,7 @@ dep 'chap-secrets' do
   template = dependency.load_path.parent / 'chap-secrets.erb'
 
   # TODO: Fix permissions so non-root can compare, or switch to root to compare.
+  met? { false }
   meet { render_erb template, :to => target, :sudo => true }
 end
 
