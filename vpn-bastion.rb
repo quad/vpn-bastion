@@ -20,7 +20,7 @@ dep 'bastion' do
            'chap-secrets'
 
   requires 'sysctl.conf',
-	   'rc.local'
+           'rc.local'
 end
 
 dep 'sysctl.conf' do
