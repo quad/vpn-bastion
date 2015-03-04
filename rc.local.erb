@@ -1,0 +1,2 @@
+iptables --table nat --flush
+iptables --table nat --append POSTROUTING --source 192.88.88.0/24 --out-interface tun0 --jump MASQUERADE
