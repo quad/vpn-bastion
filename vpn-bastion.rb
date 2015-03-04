@@ -143,9 +143,14 @@ end
 dep 'vnc directory' do
   target = '~/.vnc'.p
 
-  met? { target.dir? && File.stat(target).mode == 040700 }
+  met? {
+    target.dir? &&
+         File.stat(target).mode == 040700 &&
+         File.stat(target).uid == 0
+  }
   meet {
     target.mkdir
     sudo "chmod 700 #{target}"
+    sudo "chown root.root #{target}"
   }
 end
