@@ -95,7 +95,7 @@ dep 'chap-secrets' do
   end
 
   met? {
-    look { Babushka::Renderable.new(target).from(template) } &&
+    look { Babushka::Renderable.new(target).from?(template) } &&
         File.stat(target).mode == 0100600
   }
   meet {
