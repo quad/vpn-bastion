@@ -147,8 +147,18 @@ dep 'xstartup' do
     sudo "chmod 700 '#{target.dirname}'"
   end
 
-  met? { look { Babushka::Renderable.new(target).from?(template) } }
-  meet { look { render_erb template, :to => target, :sudo => true } }
+  met? {
+    look {
+      Babushka::Renderable.new(target).from?(template) &&
+      File.stat(target).mode == 0010755
+    }
+  }
+  meet {
+    look {
+      render_erb template, :to => target, :sudo => true
+      sudo "chmod 755 '#{target}'"
+    }
+  }
 end
 
 dep 'vnc directory' do
@@ -161,7 +171,7 @@ dep 'vnc directory' do
   }
   meet {
     target.mkdir
-    sudo "chmod 700 #{target}"
-    sudo "chown root.root #{target}"
+    sudo "chmod 700 '#{target}'"
+    sudo "chown root.root '#{target}'"
   }
 end
