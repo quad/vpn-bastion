@@ -1,5 +1,8 @@
 dep 'provision' do
-  requires 'local apt sources'.with('cn'), 'vpn', 'bastion'
+  requires 'local apt sources'.with('cn'),
+           # dep('initscripts.managed')   # Workaround https://bugs.launchpad.net/bugs/1278437
+           'vpn',
+           'bastion'
 end
 
 dep 'local apt sources', :country do
