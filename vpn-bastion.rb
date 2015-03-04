@@ -147,7 +147,7 @@ dep 'xstartup' do
 end
 
 dep 'vnc directory' do
-  directory = '~/.vnc'.p
+  target = '~/.vnc'.p
 
   met? {
     target.dir? &&
