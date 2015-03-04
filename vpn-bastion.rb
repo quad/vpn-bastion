@@ -125,7 +125,7 @@ dep 'dpkg architecture', :arch do
 end
 
 dep 'vnc' do
-  requires 'xstartup'
+  requires 'xstartup',
            dep('tightvncserver.managed'),
            dep('matchbox-window-manager.managed')
 end
