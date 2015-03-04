@@ -145,4 +145,5 @@ dep 'vnc directory' do
 
   met? { target.dir? }
   meet { target.mkdir }
+  after { sudo "chmod 700 #{target}" }
 end
