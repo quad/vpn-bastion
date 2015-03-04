@@ -143,14 +143,14 @@ dep 'xstartup' do
 
   def look
     sudo "chmod 755 '#{target.dirname}'"
-    yield
+    retval = yield
     sudo "chmod 700 '#{target.dirname}'"
+    retval
   end
 
   met? {
     look {
-      Babushka::Renderable.new(target).from?(template) &&
-      File.stat(target).mode == 0010755
+      Babushka::Renderable.new(target).from?(template) && File.stat(target).mode == 0100755
     }
   }
   meet {
