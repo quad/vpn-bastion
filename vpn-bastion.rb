@@ -95,6 +95,7 @@ dep 'java.managed' do
 
   installs {
     via :apt,
+        'initscripts',
         'default-jre',
         'icedtea-plugin',
         'openjdk-7-jre:i386'
