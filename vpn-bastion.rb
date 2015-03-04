@@ -79,13 +79,29 @@ dep 'pptpd-options' do
 end
 
 dep 'chap-secrets' do
-  target = '/etc/ppp/chap-secrets'
-  template = dependency.load_path.parent / 'chap-secrets.erb'
+  def target
+    '/etc/ppp/chap-secrets'
+  end
 
-  before { sudo "chmod 644 '#{target}'" }
-  met? { Babushka::Renderable.new(target) }
-  meet { render_erb template, :to => target, :sudo => true }
-  after { sudo "chmod 600 '#{target}'" }
+  def template
+    dependency.load_path.parent / 'chap-secrets.erb'
+  end
+
+  def look
+    sudo "chmod 644 '#{target}'"
+    retval = yield
+    sudo "chmod 600 '#{target}'"
+    retval
+  end
+
+  met? {
+    look { Babushka::Renderable.new(target).from(template) } &&
+        File.stat(target).mode == 0100600
+  }
+  meet {
+    render_erb template, :to => target, :sudo => true
+    sudo "chmod 600 '#{target}'"
+  }
 end
 
 dep 'vpn' do
