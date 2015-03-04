@@ -76,12 +76,13 @@ dep 'chap-secrets' do
 end
 
 dep 'vpn' do
-  requires 'openjdk-7-jre.managed',
+  requires dep('openjdk-7-jre.managed'),
            dep('icedtea-plugin.managed'),
            dep('firefox.managed'),
            dep('xterm.managed'),
            dep('matchbox-window-manager.managed'),
            dep('tightvncserver.managed'),
+           'openjdk i386.managed',
            'update-alternatives fix'
 end
 
@@ -94,11 +95,9 @@ dep 'update-alternatives fix' do
   meet { sudo "ln -s '#{bin}' '#{sbin}'" }
 end
 
-dep 'openjdk-7-jre.managed' do
+dep 'openjdk i386.managed' do
   requires 'dpkg architecture'.with('i386')
-  installs { via :apt,
-             'openjdk-7-jre',
-             'openjdk-7-jre:i386' }
+  installs { via :apt, 'openjdk-7-jre:i386' }
   provides 'java'
 end
 
