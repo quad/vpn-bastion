@@ -1,2 +1,9 @@
 iptables --table nat --flush
 iptables --table nat --append POSTROUTING --source 192.88.88.0/24 --out-interface tun0 --jump MASQUERADE
+
+# Jenkins port forward
+iptables -t nat -A PREROUTING -p tcp -d 172.31.4.48 --dport 8080 -j DNAT --to 172.18.65.242:8080
+iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
+# China network VPN bypass
+ip route add 125.69.76.0/24 via 172.31.0.1 dev eth0
