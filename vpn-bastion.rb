@@ -59,9 +59,9 @@ dep 'rc.local' do
   }
 end
 
-dep 'pptp.conf' do
-  target = '/etc/pptp.conf'
-  template = dependency.load_path.parent / 'pptp.conf.erb'
+dep 'pptpd.conf' do
+  target = '/etc/pptpd.conf'
+  template = dependency.load_path.parent / 'pptpd.conf.erb'
 
   met? { Babushka::Renderable.new(target).from?(template) }
   meet { render_erb template, :to => target, :sudo => true }
