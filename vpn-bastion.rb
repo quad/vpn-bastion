@@ -17,11 +17,6 @@ dep 'upgraded packages' do
 end
 
 dep 'bastion' do
-  requires dep('pptpd.managed'),
-           'pptp.conf',
-           'pptpd-options',
-           'chap-secrets'
-
   requires 'sysctl.conf',
            'rc.local'
 end
@@ -45,51 +40,6 @@ dep 'rc.local' do
   meet {
     render_erb template, :to => target, :sudo => true
     sudo '/etc/rc.local'
-  }
-end
-
-dep 'pptpd.conf' do
-  target = '/etc/pptpd.conf'
-  template = dependency.load_path.parent / 'pptpd.conf.erb'
-
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet { render_erb template, :to => target, :sudo => true }
-end
-
-dep 'pptpd-options' do
-  target = '/etc/ppp/pptpd-options'
-  template = dependency.load_path.parent / 'pptp-options.erb'
-
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet {
-    render_erb template, :to => target, :sudo => true
-    sudo 'service pptpd restart'
-  }
-end
-
-dep 'chap-secrets' do
-  def target
-    '/etc/ppp/chap-secrets'
-  end
-
-  def template
-    dependency.load_path.parent / 'chap-secrets.erb'
-  end
-
-  def look
-    sudo "chmod 644 '#{target}'"
-    retval = yield
-    sudo "chmod 600 '#{target}'"
-    retval
-  end
-
-  met? {
-    look { Babushka::Renderable.new(target).from?(template) } &&
-        File.stat(target).mode == 0100600
-  }
-  meet {
-    render_erb template, :to => target, :sudo => true
-    sudo "chmod 600 '#{target}'"
   }
 end
 
