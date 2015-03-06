@@ -1,3 +1,5 @@
+require 'socket'
+
 dep 'provision' do
   requires 'upgraded packages',
            'vpn',
@@ -35,6 +37,24 @@ end
 dep 'rc.local' do
   target = '/etc/rc.local'
   template = dependency.load_path.parent / 'rc.local.erb'
+
+  def our_ip
+    Socket.ip_address_list.find { |a| a.ipv4? && !a.ipv4_loopback? }.ip_address
+  end
+
+  def jira
+    {ip: '172.18.65.242', port: 8080}
+  end
+
+  def chendu_network
+    '125.69.76.0/24'
+  end
+
+  def gateway
+    `ip -o route list scope global`.
+      split.
+      find { |i| i =~ /\d+\.\d+\.\d+\.\d+/ }
+  end
 
   met? { Babushka::Renderable.new(target).from?(template) }
   meet {
