@@ -1,24 +1,13 @@
 dep 'provision' do
-  requires 'local apt sources'.with('cn'),
-           'upgraded packages',
+  requires 'upgraded packages',
            'vpn',
            'vnc',
            'bastion'
 end
 
-dep 'local apt sources', :country do
-  target = '/etc/apt/sources.list'
-  template = dependency.load_path.parent / 'sources.list.erb'
-
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet {
-    render_erb template, :to => target, :sudo => true
-    Babushka::AptHelper.update_pkg_lists "Updating apt with #{country} mirrors"
-  }
-end
-
 dep 'upgraded packages' do
   met? {
+    Babushka::AptHelper.update_pkg_lists "Updating apt package lists"
     upgrade_check = `#{Babushka::AptHelper.pkg_cmd} -s -y upgrade`
     upgrade_check =~ /\b0 packages upgraded/ || upgrade_check =~ /\b0 upgraded/
   }
