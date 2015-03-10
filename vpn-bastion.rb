@@ -46,6 +46,10 @@ dep 'rc.local' do
     {ip: '172.18.65.242', port: 8080}
   end
 
+  def stash
+    {ip: '10.1.7.231', port: 443}
+  end
+
   def chendu_network
     '125.69.76.0/24'
   end

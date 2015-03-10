@@ -2,9 +2,13 @@ iptables --flush
 iptables --table nat --flush
 iptables --delete-chain
 
+iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
 # Jenkins port forward
 iptables -t nat -A PREROUTING -p tcp -d <%= our_ip %> --dport <%= jira[:port] %> -j DNAT --to <%= jira[:ip] %>:<%= jira[:port] %>
-iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+
+# Stash port forward
+iptables -t nat -A PREROUTING -p tcp -d <%= our_ip %> --dport <%= stash[:port] %> -j DNAT --to <%= stash[:ip] %>:<%= stash[:port] %>
 
 # China network VPN bypass
 ip route add <%= chendu_network %> via <%= gateway %> dev eth0
