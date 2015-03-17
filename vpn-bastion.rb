@@ -1,7 +1,8 @@
 require 'socket'
 
 dep 'provision' do
-  requires 'upgraded packages',
+  requires 'hostname'.with('vpn-bastion'),
+           'upgraded packages',
            'vpn',
            'vnc',
            'bastion'
@@ -153,5 +154,13 @@ dep 'vnc directory' do
     target.mkdir
     sudo "chmod 700 '#{target}'"
     sudo "chown root.root '#{target}'"
+  }
+end
+
+dep 'hostname', :host_name do
+  met? { shell('hostname') == host_name }
+  meet {
+    sudo "hostnamectl set-hostname #{host_name}"
+    sudo "sed -ri 's/^127.0.0.1.*$/127.0.0.1 #{host_name} localhost/' /etc/hosts"
   }
 end
