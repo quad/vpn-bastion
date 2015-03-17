@@ -20,7 +20,8 @@ end
 
 dep 'bastion' do
   requires 'sysctl.conf',
-           'rc.local'
+           'rc.local',
+	   dep('tinyproxy.managed')
 end
 
 dep 'sysctl.conf' do
