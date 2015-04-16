@@ -3,6 +3,7 @@ require 'socket'
 dep 'provision' do
   requires 'hostname'.with('vpn-bastion'),
            'upgraded packages',
+           'unattended upgrades',
            'vpn',
            'vnc',
            'bastion'
@@ -17,6 +18,15 @@ dep 'upgraded packages' do
   meet { log_shell 'Upgrading distribution',
                    "#{Babushka::AptHelper.pkg_cmd} -y upgrade",
                    :sudo => Babushka::AptHelper.should_sudo? }
+end
+
+dep 'unattended upgrades' do
+  conf = '/etc/apt/apt.conf.d/20auto-upgrades'
+  met? { File.read(conf).include? 'Unattended-Upgrade "1"' }
+  meet {
+    sudo %(echo 'unattended-upgrades unattended-upgrades/enable_auto_updates select true' | debconf-set-selections)
+    sudo %(dpkg-reconfigure -f noninteractive unattended-upgrades)
+  }
 end
 
 dep 'bastion' do
