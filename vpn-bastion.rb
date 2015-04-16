@@ -45,7 +45,7 @@ dep 'rc.local' do
   end
 
   def jira
-    {ip: '172.18.65.242', port: 8080}
+    {ip: '172.18.94.227', port: 8080}
   end
 
   def stash
