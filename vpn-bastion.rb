@@ -54,7 +54,7 @@ dep 'rc.local' do
     Socket.ip_address_list.find { |a| a.ipv4? && !a.ipv4_loopback? }.ip_address
   end
 
-  def jira
+  def jenkins
     {ip: '172.18.94.227', port: 8080}
   end
 
