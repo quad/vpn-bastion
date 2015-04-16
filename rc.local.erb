@@ -11,4 +11,5 @@ iptables -t nat -A PREROUTING -p tcp -d <%= our_ip %> --dport <%= jenkins[:port]
 iptables -t nat -A PREROUTING -p tcp -d <%= our_ip %> --dport <%= stash[:port] %> -j DNAT --to <%= stash[:ip] %>:<%= stash[:port] %>
 
 # China network VPN bypass
+ip route del <%= chendu_network %> || true
 ip route add <%= chendu_network %> via <%= gateway %> dev eth0
