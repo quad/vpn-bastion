@@ -21,8 +21,11 @@ dep 'upgraded packages' do
 end
 
 dep 'unattended upgrades' do
-  conf = '/etc/apt/apt.conf.d/20auto-upgrades'
-  met? { File.read(conf).include? 'Unattended-Upgrade "1"' }
+  def conf
+    '/etc/apt/apt.conf.d/20auto-upgrades'.p.read || ''
+  end
+
+  met? { conf.include? 'Unattended-Upgrade "1"' }
   meet {
     sudo %(echo 'unattended-upgrades unattended-upgrades/enable_auto_updates select true' | debconf-set-selections)
     sudo %(dpkg-reconfigure -f noninteractive unattended-upgrades)
