@@ -90,6 +90,14 @@ dep 'vpn' do
            'update-alternatives fix'
 end
 
+dep 'dhclient.conf' do
+  target = '/etc/dhcp/dhclient.conf'
+  template = dependency.load_path.parent / 'dhclient.conf.erb'
+
+  met? { Babushka::Renderable.new(target).from?(template) }
+  meet { render_erb template, :to => target, :sudo => true }
+end
+
 dep 'update-alternatives fix' do
   name = 'update-alternatives'
   bin = '/usr/bin' / name
