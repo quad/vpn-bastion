@@ -15,7 +15,7 @@ laptop$ ssh ubuntu@1.2.3.4 -L 5901:localhost:5901
 ubuntu$ sudo tightvncserver -nolisten tcp -localhost :1
 ```
 
-Then start a VNC client (*Screen Sharing* on OSX) and connect to `localhost:5901`.
+Then start a VNC client (*Screen Sharing* on OSX) and connect to `localhost:5901`. The password is `abc123`.
 
 ```shell
 ubuntu$ firefox
