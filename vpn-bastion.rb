@@ -33,26 +33,22 @@ dep 'unattended upgrades' do
 end
 
 dep 'bastion' do
-  requires 'sysctl.conf',
-           'rc.local',
+  requires 'sysctl.conf.file',
+           'rc.local.file',
 	   dep('tinyproxy.managed'),
-           'dhclient.conf'
+           'dhclient.conf.file'
 end
 
-dep 'sysctl.conf' do
-  target = '/etc/sysctl.conf'
-  template = dependency.load_path.parent / 'sysctl.conf.erb'
+dep 'sysctl.conf.file' do
+  target '/etc/sysctl.conf'
+  source 'sysctl.conf.erb'
 
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet {
-    render_erb template, :to => target, :sudo => true
-    sudo 'sysctl -p'
-  }
+  after { sudo 'sysctl -p' }
 end
 
-dep 'rc.local' do
-  target = '/etc/rc.local'
-  template = dependency.load_path.parent / 'rc.local.erb'
+dep 'rc.local.file' do
+  target '/etc/rc.local'
+  source 'rc.local.erb'
 
   def our_ip
     Socket.ip_address_list.find { |a| a.ipv4? && !a.ipv4_loopback? }.ip_address
@@ -76,11 +72,7 @@ dep 'rc.local' do
       find { |i| i =~ /\d+\.\d+\.\d+\.\d+/ }
   end
 
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet {
-    render_erb template, :to => target, :sudo => true
-    sudo '/etc/rc.local'
-  }
+  after { sudo '/etc/rc.local' }
 end
 
 dep 'vpn' do
@@ -91,12 +83,9 @@ dep 'vpn' do
            'update-alternatives fix'
 end
 
-dep 'dhclient.conf' do
-  target = '/etc/dhcp/dhclient.conf'
-  template = dependency.load_path.parent / 'dhclient.conf.erb'
-
-  met? { Babushka::Renderable.new(target).from?(template) }
-  meet { render_erb template, :to => target, :sudo => true }
+dep 'dhclient.conf.file' do
+  target '/etc/dhcp/dhclient.conf'
+  source 'dhclient.conf.erb'
 end
 
 dep 'update-alternatives fix' do
@@ -184,5 +173,23 @@ dep 'hostname', :host_name do
   meet {
     sudo "hostnamectl set-hostname #{host_name}"
     sudo "sed -ri 's/^127.0.0.1.*$/127.0.0.1 #{host_name} localhost/' /etc/hosts"
+  }
+end
+
+meta :file do
+  accepts_value_for :source
+  accepts_value_for :target
+
+  template {
+    def template
+      dependency.load_path.parent / source
+    end
+
+    met? {
+      Babushka::Renderable.new(target).from?(template)
+    }
+    meet {
+      render_erb template, :to => target, :sudo => true
+    }
   }
 end
