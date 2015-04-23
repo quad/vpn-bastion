@@ -1,4 +1,6 @@
+require 'securerandom'
 require 'socket'
+require 'tempfile'
 
 dep 'provision' do
   requires 'hostname'.with('vpn-bastion'),
@@ -6,7 +8,84 @@ dep 'provision' do
            'unattended upgrades',
            'vpn',
            'vnc',
-           'bastion'
+           'bastion',
+           'ipsec'
+end
+
+dep 'ipsec' do
+  requires 'eth0.cfg.file',
+           dep('openswan.managed') { provides 'ipsec' },
+           dep('xl2tpd.managed'),
+           'ipsec.conf.file',
+           'ipsec.secrets.file',
+           'xl2tpd.conf',
+           'options.xl2tpd.file',
+           'chap-secrets.file'
+end
+
+dep 'eth0.cfg.file' do
+  target '/etc/network/interfaces.d/eth0.cfg'
+  source 'eth0.cfg.erb'
+end
+
+dep 'ipsec.conf.file' do
+  target '/etc/ipsec.conf'
+  source 'ipsec.conf.erb'
+
+  after { sudo 'service ipsec reload' }
+end
+
+dep 'ipsec.secrets.file' do
+  target '/etc/ipsec.secrets'
+  source 'ipsec.secrets.erb'
+  perms 600
+
+  def secrets_file
+    dependency.load_path.parent / 'secrets'
+  end
+
+  def secret
+    if secrets_file.p.exists? 
+      secrets_file.read
+    else
+      SecureRandom.random_number(36**12).to_s(36).rjust(12, "0").tap do |s|
+        secrets_file.write s
+      end
+    end
+  end
+end
+
+dep 'xl2tpd.conf' do
+  def target
+    '/etc/xl2tpd/xl2tpd.conf'.p
+  end
+
+  def source
+    'xl2tpd.conf.erb'.p
+  end
+
+  def source_sha
+    Digest::SHA2.digest source.p.read
+  end
+
+  def target_sha
+    Digest::SHA2.digest target.p.read
+  end
+
+  met? { source_sha == target_sha  }
+  meet { sudo "cp '#{source}' '#{target}'" }
+  after { sudo 'service xl2tpd restart' }
+end
+
+dep 'options.xl2tpd.file' do
+  target '/etc/ppp/options.xl2tpd'
+  source 'options.xl2tpd.erb'
+end
+
+dep 'chap-secrets.file' do
+  target '/etc/ppp/chap-secrets'
+  source 'chap-secrets.erb'
+  perms 600
 end
 
 dep 'upgraded packages' do
@@ -179,17 +258,30 @@ end
 meta :file do
   accepts_value_for :source
   accepts_value_for :target
+  accepts_value_for :perms
 
   template {
     def template
       dependency.load_path.parent / source
     end
 
+    def peek restricted_filename
+      if restricted_filename.p.readable?
+        yield restricted_filename
+      else
+        Tempfile.open(restricted_filename.p.basename.to_s) do |tf|
+          tfn = tf.path.p
+          tfn.write sudo("cat '#{restricted_filename}'")
+          yield tfn
+        end
+      end
+    end
+
     met? {
-      Babushka::Renderable.new(target).from?(template)
+      peek(target) { |fn| Babushka::Renderable.new(fn).from?(template) }
     }
     meet {
-      render_erb template, :to => target, :sudo => true
+      render_erb template, :to => target, :sudo => true, :perms => perms || 644
     }
   }
 end

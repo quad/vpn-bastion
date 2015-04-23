@@ -1,8 +1,15 @@
 iptables --flush
 iptables --table nat --flush
+iptables --table filter --flush
 iptables --delete-chain
 
-iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+# Block L2TP except from ipsec
+iptables -t filter -A INPUT -p udp -m policy --dir in --pol ipsec -m udp --dport l2tp -j ACCEPT
+iptables -t filter -A INPUT -p udp -m udp --dport l2tp -j REJECT --reject-with icmp-port-unreachable
+iptables -t filter -A OUTPUT -p udp -m policy --dir out --pol ipsec -m udp --sport l2tp -j ACCEPT
+iptables -t filter -A OUTPUT -p udp -m udp --sport l2tp -j REJECT --reject-with icmp-port-unreachable
+
+iptables -t nat -A POSTROUTING -s 192.168.22.0/24 -o tun0 -j MASQUERADE
 
 # Jenkins port forward
 iptables -t nat -A PREROUTING -p tcp -d <%= our_ip %> --dport <%= jenkins[:port] %> -j DNAT --to <%= jenkins[:ip] %>:<%= jenkins[:port] %>

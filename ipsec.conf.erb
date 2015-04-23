@@ -1,0 +1,15 @@
+version	2.0
+
+config setup
+	protostack=netkey
+        nat_traversal=yes
+
+conn L2TP-PSK
+        authby=secret
+        auto=add
+        type=transport
+        left=%eth0
+        leftprotoport=udp/l2tp
+        right=%any
+        rightprotoport=udp/%any
+        pfs=no
