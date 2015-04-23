@@ -61,15 +61,15 @@ dep 'xl2tpd.conf' do
   end
 
   def source
-    'xl2tpd.conf.erb'.p
+    dependency.load_path.parent / 'xl2tpd.conf.erb'
   end
 
   def source_sha
-    Digest::SHA2.digest source.p.read
+    Digest::SHA2.digest source.read
   end
 
   def target_sha
-    Digest::SHA2.digest target.p.read
+    Digest::SHA2.digest target.read
   end
 
   met? { source_sha == target_sha  }
